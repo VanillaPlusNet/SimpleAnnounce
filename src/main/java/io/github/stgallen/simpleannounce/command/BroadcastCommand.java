@@ -6,6 +6,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class BroadcastCommand {
@@ -14,15 +15,22 @@ public class BroadcastCommand {
   private ProxyServer proxyServer;
 
   public int execute(CommandContext<CommandSource> ctx) {
-    Component deserialized = Component.text()
-      .append(Component.text()
-        .color(NamedTextColor.GREEN)
-        .append(Component.text("[Broadcast] "))
-        .build()
-      )
-      .append(LegacyComponentSerializer.legacyAmpersand().deserialize("&a" + ctx.getArgument("message", String.class)))
-      .build();
-    proxyServer.getAllPlayers().forEach(player -> player.sendMessage(deserialized));
+    String message = ctx.getArgument("message", String.class);
+    Component messageComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+    Component prefix = Component.text()
+            .append(Component.text("[", NamedTextColor.GRAY))
+            .append(Component.text("Vanilla", TextColor.fromHexString("#02acfa")))
+            .append(Component.text("+", TextColor.fromHexString("#E000E0")))
+            .append(Component.text("] ", NamedTextColor.GRAY))
+            .build();
+
+
+    Component broadcastMessage = Component.text()
+            .append(prefix)
+            .append(messageComponent)
+            .build();
+
+    proxyServer.getAllPlayers().forEach(player -> player.sendMessage(broadcastMessage));
     return 1;
   }
 }
